@@ -1,7 +1,5 @@
 #------------
 # Simple Program that logs beginning and end times by given project name.
-#
-# Create a 'break' function, allow for stamping the time out and starting up again easier.
 #------------
 
 import argparse
