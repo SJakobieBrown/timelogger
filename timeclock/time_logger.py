@@ -36,7 +36,9 @@ def stop_time_log(active_project):
             print(f'Time logging stopped for project: {active_project} at {current_time}')
             print(f'Total time logged for {active_project}: {last_entry["total_time"]}')
         else:
-            print(f'Error: Project "{active_project}" is not actively being timed. Use "begin" to begin.')
+            print(f'Time logging stopped for project: {active_project} at {last_entry['end_time']}')
+            save_active_project(None)
+            set_pause(False)
     else:
         print(f'Error: No time log entries found for project {active_project}.')
 
@@ -146,7 +148,7 @@ def main():
             print("There is no active project currently running.")
 
     elif args.command == 'end':
-        if active_project and not paused:
+        if active_project:
             stop_time_log(active_project)
         else:
             if not active_project:
