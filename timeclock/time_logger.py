@@ -5,6 +5,7 @@
 import argparse
 import json
 from datetime import datetime
+import tkinter as tk
 
 TIME_LOG_FILE = 'time_log.json'
 STATUS_DATA = 'status_data.json'
@@ -131,11 +132,79 @@ def save_data(data):
     with open(STATUS_DATA, 'w') as file:
         json.dump(data, file)
 
+#------------Define Tkinter GUI -------
+root = tk.Tk()
+root.title("Project Time Clock")
+
+# Project Name entry
+project_name_label = tk.Label(root, text="Project Name:")
+project_name_label.grid(row=0, column=0, padx=10, pady=5, sticky="w")
+project_name_entry = tk.Entry(root)
+project_name_entry.grid(row=0, column=1, padx=10, pady=5)
+
+# Date entry
+date_label = tk.Label(root, text="Date (YYYY-MM-DD):")
+date_label.grid(row=1, column=0, padx=10, pady=5, sticky="w")
+date_entry = tk.Entry(root)
+date_entry.grid(row=1, column=1, padx=10, pady=5)
+date_entry.insert(0, datetime.today().strftime("%Y-%m-%d"))  # Autofill today's date
+
+#------------ GUI event handling ------
+        
+def begin_event():
+    active_project = load_active_project()
+    if not active_project:
+            project_name = project_name_entry.get()
+            save_active_project(project_name)
+            begin_time_log(project_name)
+    else:
+        #impleplemt pop up box with error
+        pass
+
+def pause_event():
+    active_project = load_active_project()
+    paused = get_pause()
+    if active_project:
+            pause_time_log(active_project, paused)
+    else:
+        #impleplemt pop up box with error
+        pass
+
+def end_event():
+    active_project = load_active_project()
+    if active_project:
+            stop_time_log(active_project)
+    else:
+        #impleplemt pop up box with error
+        pass
+
+def report_event():
+    active_project = load_active_project()
+    paused = get_pause()
+    if not active_project or paused:
+        display_report_by_day(date_entry.get())
+    else:
+        #impleplemt pop up box with error
+        pass
+
+
+# Buttons
+begin_button = tk.Button(root, text="Begin", command=begin_event)
+begin_button.grid(row=2, column=0, padx=10, pady=5)
+
+pause_resume_button = tk.Button(root, text="Pause/Resume", command=pause_event)
+pause_resume_button.grid(row=2, column=1, padx=10, pady=5)
+
+end_button = tk.Button(root, text="End", command=end_event)
+end_button.grid(row=2, column=2, padx=10, pady=5)
+
+report_button = tk.Button(root, text="Report", command=report_event)
+report_button.grid(row=2, column=3, padx=10, pady=5)
 
 #------------ driver code -----------
 def main():
     parser = argparse.ArgumentParser(description='Time logging script for projects.')
-    parser.add_argument('command', choices=['begin', 'pause_resume', 'end', 'today', 'report', 'status'], help='Command to perform (begin, end, today)')
+    parser.add_argument('command', choices=['begin', 'pause_resume', 'end', 'today', 'report', 'status', 'gui'], help='Command to perform (begin, end, today)')
     args = parser.parse_args()
 
     active_project = load_active_project()
@@ -151,10 +220,7 @@ def main():
         if active_project:
             stop_time_log(active_project)
         else:
-            if not active_project:
-                print("There is no active project currently running.")
-            elif paused:
-                print(f"{active_project} is currently paused. Please unpause to end project")
+            print("There is no active project currently running.")
         
     elif args.command == 'begin':
         if not active_project:
@@ -178,6 +244,9 @@ def main():
 
     elif args.command == 'status':
         print(f"Project: {active_project} - Paused: {paused}")
+
+    elif args.command == 'gui':
+        root.mainloop()
 
 if __name__ == "__main__":
     main()
